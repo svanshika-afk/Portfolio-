@@ -546,6 +546,37 @@ ul {
   justify-content: center;
 }
 
+/* Profile Photo */
+.photo-wrapper {
+  position: relative;
+  width: 280px;
+  height: 280px;
+}
+
+.photo-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid #1A4A3A;
+  border-radius: 12px;
+  transform: translate(10px, 10px);
+  z-index: -1;
+}
+
+.about-photo {
+  width: 280px;
+  height: 280px;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.photo-wrapper:hover .about-photo {
+  transform: scale(1.02);
+}
+
 .stat-card {
   background: var(--cream);
   border-radius: var(--radius);

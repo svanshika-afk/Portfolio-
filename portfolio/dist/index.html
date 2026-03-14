@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vanshika Srinivas — AI Engineer & ML Researcher</title>
+  <meta name="description"
+    content="Portfolio of Vanshika Srinivas — AI Engineer, MSc AI/ML student at Christ University, Bangalore. Building intelligent systems from pixels to predictions." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <script type="module" crossorigin src="/assets/index-CpFd8TMj.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-C8ntXrA5.css">
+</head>
+
+<body>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor-dot" id="cursor-dot"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
+
+  <!-- SCROLL PROGRESS BAR -->
+  <div class="scroll-progress" id="scroll-progress"></div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <a href="#" class="nav-logo">VS</a>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#about" class="nav-link" data-section="about">About</a></li>
+      <li><a href="#experience" class="nav-link" data-section="experience">Experience</a></li>
+      <li><a href="#projects" class="nav-link" data-section="projects">Projects</a></li>
+      <li><a href="#skills" class="nav-link" data-section="skills">Skills</a></li>
+      <li><a href="#contact" class="nav-link" data-section="contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <canvas class="hero-canvas" id="hero-canvas"></canvas>
+    <div class="hero-mobile-bg" id="hero-mobile-bg" style="display:none;">
+      <svg viewBox="0 0 200 600" xmlns="http://www.w3.org/2000/svg" class="hero-mobile-svg">
+        <path d="M60 50 Q140 150 60 250 Q-20 350 60 450 Q140 550 60 650" fill="none" stroke="#1A4A3A" stroke-width="1.5"
+          opacity="0.12" />
+        <path d="M140 50 Q60 150 140 250 Q220 350 140 450 Q60 550 140 650" fill="none" stroke="#1A4A3A"
+          stroke-width="1.5" opacity="0.12" />
+        <line x1="60" y1="150" x2="140" y2="150" stroke="#7A9E8E" stroke-width="0.8" opacity="0.08" />
+        <line x1="60" y1="250" x2="140" y2="250" stroke="#7A9E8E" stroke-width="0.8" opacity="0.08" />
+        <line x1="60" y1="350" x2="140" y2="350" stroke="#7A9E8E" stroke-width="0.8" opacity="0.08" />
+        <line x1="60" y1="450" x2="140" y2="450" stroke="#7A9E8E" stroke-width="0.8" opacity="0.08" />
+      </svg>
+    </div>
+    <div class="hero-content">
+      <h1 class="hero-name">
+        <span class="hero-name-line" id="hero-first">Vanshika</span>
+        <span class="hero-name-line" id="hero-last">Srinivas</span>
+      </h1>
+      <p class="hero-subtitle" id="hero-subtitle">AI Engineer · MSc AI/ML · Christ University</p>
+      <p class="hero-tagline" id="hero-tagline">Building intelligent systems — from pixels to predictions.</p>
+      <div class="hero-ctas" id="hero-ctas">
+        <a href="#projects" class="btn btn-primary">View My Work</a>
+        <a href="https://github.com/svanshika-afk" target="_blank" rel="noopener" class="btn btn-outline">GitHub ↗</a>
+      </div>
+    </div>
+    <div class="scroll-indicator" id="scroll-indicator">
+      <span class="scroll-indicator-text">scroll</span>
+      <span class="scroll-indicator-line"></span>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section about" id="about">
+    <div class="container about-grid">
+      <div class="about-left">
+        <h2 class="section-heading" data-animate="heading">About</h2>
+        <blockquote class="about-quote">
+          "Fascinated by how machines learn. Focused on making it useful."
+        </blockquote>
+        <p class="about-bio">
+          M.Sc. AI/ML student at Christ University, currently working as an AI Engineer
+          Intern at the Centre for AI. I'm genuinely fascinated by how machines learn,
+          and even more interested in making that actually useful. My work spans computer
+          vision, ML pipelines, and full-stack AI. I care a lot more about models that
+          work in the real world than ones that just look good on paper.
+        </p>
+      </div>
+      <div class="about-right">
+        <div class="about-currently">
+          <p class="about-currently-label">RIGHT NOW</p>
+          <p>↳ AI Engineer Intern @ Centre for AI, Christ University</p>
+          <p>↳ MSc AI/ML, Christ University (2025–2027)</p>
+          <p>↳ Building: ANPR System + NutriAdapt</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="section experience" id="experience">
+    <div class="container">
+      <h2 class="section-heading" data-animate="heading">Experience</h2>
+      <div class="exp-card exp-card--main" data-animate="card">
+        <div class="exp-card-inner">
+          <h3 class="exp-role">AI Engineer Intern</h3>
+          <p class="exp-company">
+            <span class="green-dot"></span>
+            Centre for AI · Christ University
+          </p>
+          <p class="exp-meta">Bangalore · 2025 – Present</p>
+          <p class="exp-desc">
+            Working on applied AI research and development at the university's dedicated AI centre.
+            Building and evaluating ML models for real-world use cases.
+          </p>
+        </div>
+      </div>
+
+      <h3 class="subsection-heading" data-animate="heading">Education</h3>
+      <div class="edu-grid">
+        <div class="exp-card" data-animate="card">
+          <div class="exp-card-inner">
+            <h3 class="exp-role">M.Sc. Artificial Intelligence &amp; Machine Learning</h3>
+            <p class="exp-company">Christ (Deemed to be University), Bangalore</p>
+            <p class="exp-meta">2025 – 2027</p>
+          </div>
+        </div>
+        <div class="exp-card" data-animate="card">
+          <div class="exp-card-inner">
+            <h3 class="exp-role">Bachelor of Computer Applications (BCA)</h3>
+            <p class="exp-company">Krupanidhi Degree College, Bangalore</p>
+            <p class="exp-meta">2022 – 2025</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="section projects" id="projects">
+    <div class="container">
+      <h2 class="section-heading" data-animate="heading">Selected Work</h2>
+
+      <div class="project-card" data-animate="card-left" data-tilt>
+        <span class="project-number">01</span>
+        <div class="project-card-body">
+          <div class="project-header">
+            <h3 class="project-name">Automatic License Plate Recognition</h3>
+            <span class="status-badge">In Progress</span>
+          </div>
+          <p class="project-desc">
+            Building a real-time vehicle detection and license plate recognition pipeline using YOLOv8 and SORT
+            tracking.
+            Implementing IoU-based plate-to-vehicle association with temporal aggregation to reduce duplicate
+            predictions.
+            Applying image preprocessing techniques to improve OCR performance under motion blur and varying lighting
+            conditions.
+            Designing a relational MySQL schema for scalable backend integration.
+          </p>
+          <div class="project-tags">
+            <span class="tag">YOLOv8</span>
+            <span class="tag">SORT</span>
+            <span class="tag">OCR</span>
+            <span class="tag">MySQL</span>
+          </div>
+          <a href="https://github.com/yourusername" target="_blank" rel="noopener" class="project-link">View on GitHub
+            ↗</a>
+        </div>
+        <div class="project-hover-gradient"></div>
+      </div>
+
+      <div class="project-card" data-animate="card-right" data-tilt>
+        <span class="project-number">02</span>
+        <div class="project-card-body">
+          <div class="project-header">
+            <h3 class="project-name">NutriAdapt — Personalized Diet Planning</h3>
+            <span class="status-badge">In Progress</span>
+          </div>
+          <p class="project-desc">
+            Developing a full-stack web application generating personalized Indian meal plans based on user health
+            profiles,
+            dietary preferences, and medical conditions. Implemented calorie target calculation using the Mifflin–St
+            Jeor equation
+            and a rule-based recommendation engine filtering foods by condition. Built a curated nutrition dataset
+            (~100+ Indian foods)
+            and a constraint-relaxation meal selection algorithm to ensure safe, varied recommendations.
+          </p>
+          <div class="project-tags">
+            <span class="tag">React</span>
+            <span class="tag">Vite</span>
+            <span class="tag">FastAPI</span>
+            <span class="tag">Python</span>
+          </div>
+          <a href="https://github.com/yourusername" target="_blank" rel="noopener" class="project-link">View on GitHub
+            ↗</a>
+        </div>
+        <div class="project-hover-gradient"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="section skills" id="skills">
+    <div class="container">
+      <h2 class="section-heading" data-animate="heading">Technical Skills</h2>
+      <div class="skills-rows" id="skills-rows">
+        <div class="skill-row" data-animate="skill-row">
+          <div class="skill-row-label">ML &amp; Deep Learning</div>
+          <div class="skill-row-items">
+            <span class="skill-item">Supervised Learning</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">Neural Networks</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">CNNs</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">Model Training</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">Regularization</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">Model Evaluation</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">Hyperparameter Tuning</span>
+          </div>
+        </div>
+        <div class="skill-row" data-animate="skill-row">
+          <div class="skill-row-label">Libraries &amp; Frameworks</div>
+          <div class="skill-row-items">
+            <span class="skill-item">PyTorch</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">TensorFlow</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">Scikit-learn</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">NumPy</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">Pandas</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">OpenCV</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">Matplotlib</span>
+          </div>
+        </div>
+        <div class="skill-row" data-animate="skill-row">
+          <div class="skill-row-label">Programming Languages</div>
+          <div class="skill-row-items">
+            <span class="skill-item">Python</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">SQL</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">JavaScript</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">Java</span>
+          </div>
+        </div>
+        <div class="skill-row" data-animate="skill-row">
+          <div class="skill-row-label">Data Analysis</div>
+          <div class="skill-row-items">
+            <span class="skill-item">Data Preprocessing</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">Feature Engineering</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">Exploratory Data Analysis</span>
+          </div>
+        </div>
+        <div class="skill-row" data-animate="skill-row">
+          <div class="skill-row-label">Tools &amp; Platforms</div>
+          <div class="skill-row-items">
+            <span class="skill-item">Git</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">GitHub</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">Jupyter Notebook</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">Google Colab</span>
+          </div>
+        </div>
+        <div class="skill-row" data-animate="skill-row">
+          <div class="skill-row-label">Application Dev</div>
+          <div class="skill-row-items">
+            <span class="skill-item">REST APIs</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">FastAPI</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">React.js</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">HTML</span>
+            <span class="skill-dot">&middot;</span>
+            <span class="skill-item">CSS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- CONTACT -->
+  <section class="section contact" id="contact">
+    <div class="container contact-container">
+      <h2 class="section-heading" data-animate="heading">Open to opportunities.</h2>
+      <p class="contact-subtext">
+        I'm currently open to internships, research collaborations, and interesting AI projects. Let's connect.
+      </p>
+      <p class="contact-email" id="contact-email" title="Click to copy email">vanshikasrinivas2004@gmail.com</p>
+      <div class="contact-links">
+        <a href="mailto:vanshikasrinivas2004@gmail.com" class="contact-link magnetic-btn" data-magnetic>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+          </svg>
+          <span>Email</span>
+        </a>
+        <a href="https://www.linkedin.com/in/vanshika-srinivas-805411307/" target="_blank" rel="noopener"
+          class="contact-link magnetic-btn" data-magnetic>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+            <rect x="2" y="9" width="4" height="12" />
+            <circle cx="4" cy="4" r="2" />
+          </svg>
+          <span>LinkedIn</span>
+        </a>
+        <a href="https://github.com/svanshika-afk" target="_blank" rel="noopener" class="contact-link magnetic-btn"
+          data-magnetic>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+          </svg>
+          <span>GitHub</span>
+        </a>
+        <a href="https://medium.com/@vanshikasrinivas2004" target="_blank" rel="noopener"
+          class="contact-link magnetic-btn" data-magnetic>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4l4.5 12L13 4" />
+            <path d="M13 4l4.5 12L22 4" />
+            <line x1="2" y1="20" x2="7" y2="20" />
+            <line x1="9" y1="20" x2="15" y2="20" />
+            <line x1="17" y1="20" x2="22" y2="20" />
+          </svg>
+          <span>Medium</span>
+        </a>
+      </div>
+      <a href="#" class="btn btn-primary btn-download">Download Resume</a>
+    </div>
+  </section>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">Email copied ✓</div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <span class="footer-left">Vanshika Srinivas · 2025</span>
+      <span class="footer-center">Built with curiosity and too much coffee.</span>
+      <a href="https://github.com/svanshika-afk" target="_blank" rel="noopener" class="footer-right">GitHub ↗</a>
+    </div>
+  </footer>
+
+</body>
+
+</html>

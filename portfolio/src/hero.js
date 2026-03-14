@@ -1,5 +1,5 @@
 /* ============================================
-   hero.js — Three.js Particle Constellation +
+   hero.js — Three.js Neural Network Nodes +
    Hero Entry Animations
    ============================================ */
 
@@ -18,117 +18,22 @@ export function initHero(isTouch) {
         const mobileBg = document.getElementById('hero-mobile-bg');
         if (mobileBg) {
             mobileBg.style.display = 'block';
-            // Use CSS radial gradient fallback
             mobileBg.style.background =
                 'radial-gradient(ellipse at 50% 40%, rgba(26,74,58,0.06) 0%, transparent 60%)';
             mobileBg.style.position = 'absolute';
             mobileBg.style.inset = '0';
         }
-        initMobileParticles();
         return;
     }
 
-    // Desktop: always show particle constellation
-    initParticleConstellation();
+    // Desktop: show neural network animation
+    initNeuralNetwork();
 }
 
 /* ------------------------------------------------
-   Mobile: Reduced Particle Field (no lines, no mouse)
+   Neural Network Dots & Lines (Three.js)
    ------------------------------------------------ */
-function initMobileParticles() {
-    const canvas = document.getElementById('hero-canvas');
-    if (!canvas) return;
-
-    // Try lightweight canvas — bail to static gradient if laggy
-    const scene = new THREE.Scene();
-    const aspect = window.innerWidth / window.innerHeight;
-    const camera = new THREE.PerspectiveCamera(60, aspect, 0.1, 100);
-    camera.position.z = 12;
-
-    let renderer;
-    try {
-        renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(1);
-        renderer.setClearColor(0x000000, 0);
-    } catch (_) {
-        return; // WebGL not available — CSS gradient already showing
-    }
-
-    canvas.style.display = 'block';
-    canvas.style.opacity = '0'; // GSAP will fade this in
-
-    const MOBILE_COUNT = 60;
-    const positions = new Float32Array(MOBILE_COUNT * 3);
-    const velocities = [];
-
-    for (let i = 0; i < MOBILE_COUNT; i++) {
-        const i3 = i * 3;
-        positions[i3] = (Math.random() - 0.5) * aspect * 20;
-        positions[i3 + 1] = (Math.random() - 0.5) * 20;
-        positions[i3 + 2] = -(Math.random() * 5);
-        velocities.push({
-            vx: (Math.random() - 0.5) * 0.006,
-            vy: (Math.random() - 0.5) * 0.006,
-        });
-    }
-
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-    const mat = new THREE.PointsMaterial({
-        size: 3,
-        color: 0x1A4A3A,
-        sizeAttenuation: false,
-        transparent: true,
-        opacity: 0.8,
-    });
-
-    scene.add(new THREE.Points(geo, mat));
-
-    // Perf check
-    let frameCount = 0;
-    let startTime = performance.now();
-    let dead = false;
-
-    function animate() {
-        if (dead) return;
-        requestAnimationFrame(animate);
-
-        // Perf gate: if first 60 frames take > 2s, bail
-        frameCount++;
-        if (frameCount === 60) {
-            const elapsed = performance.now() - startTime;
-            if (elapsed > 2000) {
-                dead = true;
-                canvas.style.display = 'none';
-                return;
-            }
-        }
-
-        const pos = geo.attributes.position.array;
-        for (let i = 0; i < MOBILE_COUNT; i++) {
-            const i3 = i * 3;
-            pos[i3] += velocities[i].vx;
-            pos[i3 + 1] += velocities[i].vy;
-        }
-        geo.attributes.position.needsUpdate = true;
-        renderer.render(scene, camera);
-    }
-
-    animate();
-
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-}
-
-/* ------------------------------------------------
-   Particle Constellation (Three.js)
-   ------------------------------------------------ */
-function initParticleConstellation() {
+function initNeuralNetwork() {
     const canvas = document.getElementById('hero-canvas');
     if (!canvas) return;
 
@@ -147,119 +52,65 @@ function initParticleConstellation() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0x000000, 0);
 
-    /* --- Fog for depth fade --- */
-    scene.fog = new THREE.FogExp2(0xF7F3ED, 0.022);
+    /* ========== NODES ========== */
+    const NODE_COUNT = 120;
+    const CONNECTION_DIST = 4.2;
+    const MAX_DRIFT = 2.0;
+    const SPRING = 0.01;
 
-    /* ========== PRIMARY PARTICLES ========== */
-    const PARTICLE_COUNT = 180;
-    const CONNECTION_DIST = 2.8;
-    const MAX_DRIFT = 1.5;
-    const SPRING = 0.012;
+    const nodeGeo = new THREE.SphereGeometry(0.10, 12, 12);
+    const nodeMat = new THREE.MeshBasicMaterial({ color: 0x1A4A3A });
 
-    const positions = new Float32Array(PARTICLE_COUNT * 3);
+    const nodes = [];
     const homePositions = [];
     const velocities = [];
 
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-        const i3 = i * 3;
-        const x = (Math.random() - 0.5) * aspect * 20;
-        const y = (Math.random() - 0.5) * 20;
-        const z = -(Math.random() * 5);
+    for (let i = 0; i < NODE_COUNT; i++) {
+        const x = (Math.random() - 0.5) * aspect * 16;
+        const y = (Math.random() - 0.5) * 16;
+        const z = -(Math.random() * 3);
 
-        positions[i3] = x;
-        positions[i3 + 1] = y;
-        positions[i3 + 2] = z;
+        const mesh = new THREE.Mesh(nodeGeo, nodeMat);
+        mesh.position.set(x, y, z);
+        scene.add(mesh);
+        nodes.push(mesh);
 
         homePositions.push({ x, y, z });
         velocities.push({
-            vx: (Math.random() - 0.5) * 0.006,
-            vy: (Math.random() - 0.5) * 0.006,
+            vx: (Math.random() - 0.5) * 0.008,
+            vy: (Math.random() - 0.5) * 0.008,
         });
     }
 
-    const particleGeo = new THREE.BufferGeometry();
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-    const particleMat = new THREE.PointsMaterial({
-        size: 3,
-        color: 0x1A4A3A,
-        sizeAttenuation: false,
-        transparent: true,
-        opacity: 0.9,
-    });
-
-    const particles = new THREE.Points(particleGeo, particleMat);
-    scene.add(particles);
-
     /* ========== LINE CONNECTIONS ========== */
-    // Worst case line count: PARTICLE_COUNT*(PARTICLE_COUNT-1)/2
-    // Pre-allocate with enough room
-    const maxLines = 1200; // practical upper bound
-    const linePositions = new Float32Array(maxLines * 6); // 2 verts * 3 coords
-    const lineColors = new Float32Array(maxLines * 6); // r,g,b per vertex
-
+    const maxLines = 600;
+    const linePositions = new Float32Array(maxLines * 6);
     const lineGeo = new THREE.BufferGeometry();
     lineGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
-    lineGeo.setAttribute('color', new THREE.BufferAttribute(lineColors, 3));
     lineGeo.setDrawRange(0, 0);
 
     const lineMat = new THREE.LineBasicMaterial({
-        vertexColors: true,
+        color: 0x1A4A3A,
         transparent: true,
-        opacity: 0.25,
+        opacity: 0.22,
     });
 
     const lines = new THREE.LineSegments(lineGeo, lineMat);
     scene.add(lines);
 
-    // Line base color (normalized): #1A4A3A → (0.102, 0.290, 0.227)
-    const lineR = 0.102;
-    const lineG = 0.290;
-    const lineB = 0.227;
-
-    /* ========== BACKGROUND DEPTH PARTICLES ========== */
-    const BG_COUNT = 60;
-    const bgPositions = new Float32Array(BG_COUNT * 3);
-    const bgVelocities = [];
-
-    for (let i = 0; i < BG_COUNT; i++) {
-        const i3 = i * 3;
-        bgPositions[i3] = (Math.random() - 0.5) * aspect * 20;
-        bgPositions[i3 + 1] = (Math.random() - 0.5) * 20;
-        bgPositions[i3 + 2] = -3;
-        bgVelocities.push({
-            vx: (Math.random() - 0.5) * 0.003,
-            vy: (Math.random() - 0.5) * 0.003,
-        });
-    }
-
-    const bgGeo = new THREE.BufferGeometry();
-    bgGeo.setAttribute('position', new THREE.BufferAttribute(bgPositions, 3));
-
-    const bgMat = new THREE.PointsMaterial({
-        size: 5,
-        color: 0x7A9E8E,
-        sizeAttenuation: false,
-        transparent: true,
-        opacity: 0.5,
-    });
-
-    scene.add(new THREE.Points(bgGeo, bgMat));
-
     /* ========== MOUSE TRACKING ========== */
-    const mouse = { x: 99999, y: 99999 }; // off-screen initially
+    const mouse = { x: 99999, y: 99999 };
     const smoothMouse = { x: 99999, y: 99999 };
     let mouseActive = false;
 
     window.addEventListener('mousemove', (e) => {
         mouseActive = true;
-        // Convert to scene-space (approximate in perspective)
+        // Convert pixel position to world coords at z=0
+        const fovRad = THREE.MathUtils.degToRad(30); // half of 60°
+        const worldHalfH = Math.tan(fovRad) * 12;
+        const worldHalfW = worldHalfH * (window.innerWidth / window.innerHeight);
         const ndcX = (e.clientX / window.innerWidth) * 2 - 1;
         const ndcY = -(e.clientY / window.innerHeight) * 2 + 1;
-        // Map to world coords at z=0 for the camera at z=12
-        const fovRadians = THREE.MathUtils.degToRad(30); // half-fov
-        const worldHalfH = Math.tan(fovRadians) * 12;
-        const worldHalfW = worldHalfH * (window.innerWidth / window.innerHeight);
         mouse.x = ndcX * worldHalfW;
         mouse.y = ndcY * worldHalfH;
     });
@@ -274,112 +125,74 @@ function initParticleConstellation() {
     function animate() {
         requestAnimationFrame(animate);
 
-        const pos = particleGeo.attributes.position.array;
-
         // Smooth mouse
         if (mouseActive) {
-            smoothMouse.x += (mouse.x - smoothMouse.x) * 0.08;
-            smoothMouse.y += (mouse.y - smoothMouse.y) * 0.08;
+            smoothMouse.x += (mouse.x - smoothMouse.x) * 0.05;
+            smoothMouse.y += (mouse.y - smoothMouse.y) * 0.05;
         } else {
-            smoothMouse.x += (99999 - smoothMouse.x) * 0.08;
-            smoothMouse.y += (99999 - smoothMouse.y) * 0.08;
+            smoothMouse.x += (99999 - smoothMouse.x) * 0.05;
+            smoothMouse.y += (99999 - smoothMouse.y) * 0.05;
         }
 
-        /* --- Update primary particles --- */
-        for (let i = 0; i < PARTICLE_COUNT; i++) {
-            const i3 = i * 3;
+        /* --- Update nodes --- */
+        for (let i = 0; i < NODE_COUNT; i++) {
+            const node = nodes[i];
             const home = homePositions[i];
             const vel = velocities[i];
 
-            // Current pos
-            let px = pos[i3];
-            let py = pos[i3 + 1];
-
             // Idle drift
-            px += vel.vx;
-            py += vel.vy;
+            node.position.x += vel.vx;
+            node.position.y += vel.vy;
 
             // Spring back to home
-            const dx = px - home.x;
-            const dy = py - home.y;
+            const dx = node.position.x - home.x;
+            const dy = node.position.y - home.y;
             const driftDist = Math.sqrt(dx * dx + dy * dy);
             if (driftDist > MAX_DRIFT) {
-                px -= dx * SPRING;
-                py -= dy * SPRING;
+                node.position.x -= dx * SPRING;
+                node.position.y -= dy * SPRING;
             }
 
-            // Mouse interaction
+            // Mouse repulsion
             if (mouseActive) {
-                const mx = smoothMouse.x - px;
-                const my = smoothMouse.y - py;
+                const mx = node.position.x - smoothMouse.x;
+                const my = node.position.y - smoothMouse.y;
                 const mDist = Math.sqrt(mx * mx + my * my);
 
-                if (mDist < 3.5 && mDist > 0.001) {
-                    if (mDist < 1.2) {
-                        // Repulsion
-                        const force = 0.09 * (1 - mDist / 1.2);
-                        px -= (mx / mDist) * force;
-                        py -= (my / mDist) * force;
-                    } else {
-                        // Attraction
-                        const force = 0.06 * (1 - mDist / 3.5);
-                        px += (mx / mDist) * force;
-                        py += (my / mDist) * force;
-                    }
+                // ~120px converted to world units ≈ 2.5 at this camera setup
+                if (mDist < 2.5 && mDist > 0.001) {
+                    const force = 0.06 * (1 - mDist / 2.5);
+                    node.position.x += (mx / mDist) * force;
+                    node.position.y += (my / mDist) * force;
                 }
             }
-
-            pos[i3] = px;
-            pos[i3 + 1] = py;
         }
-
-        particleGeo.attributes.position.needsUpdate = true;
 
         /* --- Update line connections --- */
         let lineIdx = 0;
         const lPos = lineGeo.attributes.position.array;
-        const lCol = lineGeo.attributes.color.array;
 
-        for (let i = 0; i < PARTICLE_COUNT; i++) {
+        for (let i = 0; i < NODE_COUNT; i++) {
             if (lineIdx >= maxLines) break;
-            const i3 = i * 3;
-            const ax = pos[i3];
-            const ay = pos[i3 + 1];
-            const az = pos[i3 + 2];
+            const a = nodes[i].position;
 
-            for (let j = i + 1; j < PARTICLE_COUNT; j++) {
+            for (let j = i + 1; j < NODE_COUNT; j++) {
                 if (lineIdx >= maxLines) break;
-                const j3 = j * 3;
-                const bx = pos[j3];
-                const by = pos[j3 + 1];
-                const bz = pos[j3 + 2];
+                const b = nodes[j].position;
 
-                const ddx = ax - bx;
-                const ddy = ay - by;
-                const ddz = az - bz;
+                const ddx = a.x - b.x;
+                const ddy = a.y - b.y;
+                const ddz = a.z - b.z;
                 const dist = Math.sqrt(ddx * ddx + ddy * ddy + ddz * ddz);
 
                 if (dist < CONNECTION_DIST) {
-                    const alpha = (1 - dist / CONNECTION_DIST);
                     const idx6 = lineIdx * 6;
-
-                    // Vertex A
-                    lPos[idx6] = ax;
-                    lPos[idx6 + 1] = ay;
-                    lPos[idx6 + 2] = az;
-                    // Vertex B
-                    lPos[idx6 + 3] = bx;
-                    lPos[idx6 + 4] = by;
-                    lPos[idx6 + 5] = bz;
-
-                    // Color with alpha baked into brightness
-                    lCol[idx6] = lineR * alpha;
-                    lCol[idx6 + 1] = lineG * alpha;
-                    lCol[idx6 + 2] = lineB * alpha;
-                    lCol[idx6 + 3] = lineR * alpha;
-                    lCol[idx6 + 4] = lineG * alpha;
-                    lCol[idx6 + 5] = lineB * alpha;
-
+                    lPos[idx6] = a.x;
+                    lPos[idx6 + 1] = a.y;
+                    lPos[idx6 + 2] = a.z;
+                    lPos[idx6 + 3] = b.x;
+                    lPos[idx6 + 4] = b.y;
+                    lPos[idx6 + 5] = b.z;
                     lineIdx++;
                 }
             }
@@ -387,16 +200,6 @@ function initParticleConstellation() {
 
         lineGeo.setDrawRange(0, lineIdx * 2);
         lineGeo.attributes.position.needsUpdate = true;
-        lineGeo.attributes.color.needsUpdate = true;
-
-        /* --- Update background particles (just drift) --- */
-        const bgPos = bgGeo.attributes.position.array;
-        for (let i = 0; i < BG_COUNT; i++) {
-            const i3 = i * 3;
-            bgPos[i3] += bgVelocities[i].vx;
-            bgPos[i3 + 1] += bgVelocities[i].vy;
-        }
-        bgGeo.attributes.position.needsUpdate = true;
 
         renderer.render(scene, camera);
     }
