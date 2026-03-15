@@ -6,27 +6,18 @@
 import * as THREE from 'three';
 import gsap from 'gsap';
 
+/* ------------------------------------------------
+   Breakpoint config helper
+   ------------------------------------------------ */
+function getBreakpointConfig() {
+    const w = window.innerWidth;
+    if (w < 768)  return { nodeCount: 50,  nodeSize: 0.12, connectionDist: 3.0, mouseEnabled: false, pixelRatio: 1 };
+    if (w <= 1024) return { nodeCount: 80,  nodeSize: 0.10, connectionDist: 3.8, mouseEnabled: true,  pixelRatio: Math.min(window.devicePixelRatio, 2) };
+    return                 { nodeCount: 120, nodeSize: 0.10, connectionDist: 4.2, mouseEnabled: true,  pixelRatio: Math.min(window.devicePixelRatio, 2) };
+}
+
 export function initHero(isTouch) {
     initHeroAnimations();
-
-    const isMobile = window.innerWidth < 768;
-
-    // Mobile: disable Three.js, show CSS gradient fallback
-    if (isMobile) {
-        const canvas = document.getElementById('hero-canvas');
-        if (canvas) canvas.style.display = 'none';
-        const mobileBg = document.getElementById('hero-mobile-bg');
-        if (mobileBg) {
-            mobileBg.style.display = 'block';
-            mobileBg.style.background =
-                'radial-gradient(ellipse at 50% 40%, rgba(26,74,58,0.06) 0%, transparent 60%)';
-            mobileBg.style.position = 'absolute';
-            mobileBg.style.inset = '0';
-        }
-        return;
-    }
-
-    // Desktop: show neural network animation
     initNeuralNetwork();
 }
 
@@ -37,10 +28,13 @@ function initNeuralNetwork() {
     const canvas = document.getElementById('hero-canvas');
     if (!canvas) return;
 
+    // Hide the mobile SVG fallback — Three.js runs on all sizes now
+    const mobileBg = document.getElementById('hero-mobile-bg');
+    if (mobileBg) mobileBg.style.display = 'none';
+
     /* --- Scene, Camera, Renderer --- */
     const scene = new THREE.Scene();
-    const aspect = window.innerWidth / window.innerHeight;
-    const camera = new THREE.PerspectiveCamera(60, aspect, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
     camera.position.z = 12;
 
     const renderer = new THREE.WebGLRenderer({
@@ -52,38 +46,22 @@ function initNeuralNetwork() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0x000000, 0);
 
-    /* ========== NODES ========== */
-    const NODE_COUNT = 120;
-    const CONNECTION_DIST = 4.2;
+    /* ========== SHARED STATE ========== */
+    let config = getBreakpointConfig();
     const MAX_DRIFT = 2.0;
     const SPRING = 0.01;
-
-    const nodeGeo = new THREE.SphereGeometry(0.10, 12, 12);
-    const nodeMat = new THREE.MeshBasicMaterial({ color: 0x1A4A3A });
-
-    const nodes = [];
-    const homePositions = [];
-    const velocities = [];
-
-    for (let i = 0; i < NODE_COUNT; i++) {
-        const x = (Math.random() - 0.5) * aspect * 16;
-        const y = (Math.random() - 0.5) * 16;
-        const z = -(Math.random() * 3);
-
-        const mesh = new THREE.Mesh(nodeGeo, nodeMat);
-        mesh.position.set(x, y, z);
-        scene.add(mesh);
-        nodes.push(mesh);
-
-        homePositions.push({ x, y, z });
-        velocities.push({
-            vx: (Math.random() - 0.5) * 0.008,
-            vy: (Math.random() - 0.5) * 0.008,
-        });
-    }
-
-    /* ========== LINE CONNECTIONS ========== */
     const maxLines = 600;
+
+    const nodeMat = new THREE.MeshBasicMaterial({ color: 0x1A4A3A });
+    let nodeGeo = new THREE.SphereGeometry(config.nodeSize, 12, 12);
+
+    let nodes = [];
+    let homePositions = [];
+    let velocities = [];
+    let activeNodeCount = 0;
+    let connectionDist = config.connectionDist;
+
+    /* --- Line geometry (reused across rebuilds) --- */
     const linePositions = new Float32Array(maxLines * 6);
     const lineGeo = new THREE.BufferGeometry();
     lineGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
@@ -98,15 +76,60 @@ function initNeuralNetwork() {
     const lines = new THREE.LineSegments(lineGeo, lineMat);
     scene.add(lines);
 
+    /* ========== BUILD / REBUILD NODES ========== */
+    function buildNodes() {
+        // Remove old nodes from scene
+        for (const m of nodes) scene.remove(m);
+
+        config = getBreakpointConfig();
+        connectionDist = config.connectionDist;
+
+        // Rebuild geometry for the current node size
+        nodeGeo.dispose();
+        nodeGeo = new THREE.SphereGeometry(config.nodeSize, 12, 12);
+
+        nodes = [];
+        homePositions = [];
+        velocities = [];
+        activeNodeCount = config.nodeCount;
+
+        const aspect = window.innerWidth / window.innerHeight;
+        const spreadX = aspect * 8;
+        const spreadY = 8;
+
+        for (let i = 0; i < activeNodeCount; i++) {
+            const x = (Math.random() - 0.5) * 2 * spreadX;
+            const y = (Math.random() - 0.5) * 2 * spreadY;
+            const z = -(Math.random() * 3);
+
+            const mesh = new THREE.Mesh(nodeGeo, nodeMat);
+            mesh.position.set(x, y, z);
+            scene.add(mesh);
+            nodes.push(mesh);
+
+            homePositions.push({ x, y, z });
+            velocities.push({
+                vx: (Math.random() - 0.5) * 0.008,
+                vy: (Math.random() - 0.5) * 0.008,
+            });
+        }
+
+        // Update renderer pixel ratio per breakpoint
+        renderer.setPixelRatio(config.pixelRatio);
+    }
+
+    // Initial build
+    buildNodes();
+
     /* ========== MOUSE TRACKING ========== */
     const mouse = { x: 99999, y: 99999 };
     const smoothMouse = { x: 99999, y: 99999 };
     let mouseActive = false;
 
     window.addEventListener('mousemove', (e) => {
+        if (!config.mouseEnabled) return;
         mouseActive = true;
-        // Convert pixel position to world coords at z=0
-        const fovRad = THREE.MathUtils.degToRad(30); // half of 60°
+        const fovRad = THREE.MathUtils.degToRad(75 / 2);
         const worldHalfH = Math.tan(fovRad) * 12;
         const worldHalfW = worldHalfH * (window.innerWidth / window.innerHeight);
         const ndcX = (e.clientX / window.innerWidth) * 2 - 1;
@@ -125,8 +148,10 @@ function initNeuralNetwork() {
     function animate() {
         requestAnimationFrame(animate);
 
+        const useMouseInteraction = config.mouseEnabled && mouseActive;
+
         // Smooth mouse
-        if (mouseActive) {
+        if (useMouseInteraction) {
             smoothMouse.x += (mouse.x - smoothMouse.x) * 0.05;
             smoothMouse.y += (mouse.y - smoothMouse.y) * 0.05;
         } else {
@@ -135,7 +160,7 @@ function initNeuralNetwork() {
         }
 
         /* --- Update nodes --- */
-        for (let i = 0; i < NODE_COUNT; i++) {
+        for (let i = 0; i < activeNodeCount; i++) {
             const node = nodes[i];
             const home = homePositions[i];
             const vel = velocities[i];
@@ -154,12 +179,11 @@ function initNeuralNetwork() {
             }
 
             // Mouse repulsion
-            if (mouseActive) {
+            if (useMouseInteraction) {
                 const mx = node.position.x - smoothMouse.x;
                 const my = node.position.y - smoothMouse.y;
                 const mDist = Math.sqrt(mx * mx + my * my);
 
-                // ~120px converted to world units ≈ 2.5 at this camera setup
                 if (mDist < 2.5 && mDist > 0.001) {
                     const force = 0.06 * (1 - mDist / 2.5);
                     node.position.x += (mx / mDist) * force;
@@ -172,11 +196,11 @@ function initNeuralNetwork() {
         let lineIdx = 0;
         const lPos = lineGeo.attributes.position.array;
 
-        for (let i = 0; i < NODE_COUNT; i++) {
+        for (let i = 0; i < activeNodeCount; i++) {
             if (lineIdx >= maxLines) break;
             const a = nodes[i].position;
 
-            for (let j = i + 1; j < NODE_COUNT; j++) {
+            for (let j = i + 1; j < activeNodeCount; j++) {
                 if (lineIdx >= maxLines) break;
                 const b = nodes[j].position;
 
@@ -185,7 +209,7 @@ function initNeuralNetwork() {
                 const ddz = a.z - b.z;
                 const dist = Math.sqrt(ddx * ddx + ddy * ddy + ddz * ddz);
 
-                if (dist < CONNECTION_DIST) {
+                if (dist < connectionDist) {
                     const idx6 = lineIdx * 6;
                     lPos[idx6] = a.x;
                     lPos[idx6 + 1] = a.y;
@@ -198,6 +222,9 @@ function initNeuralNetwork() {
             }
         }
 
+        // Zero out remaining line vertices to avoid stale lines
+        for (let i = lineIdx * 6; i < maxLines * 6; i++) lPos[i] = 0;
+
         lineGeo.setDrawRange(0, lineIdx * 2);
         lineGeo.attributes.position.needsUpdate = true;
 
@@ -206,11 +233,20 @@ function initNeuralNetwork() {
 
     animate();
 
-    /* --- Resize handler --- */
+    /* --- Debounced resize handler (100ms) --- */
+    let resizeTimer = null;
     window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            // Update camera & renderer
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Rebuild nodes for the new breakpoint & aspect ratio
+            buildNodes();
+        }, 100);
     });
 }
 
